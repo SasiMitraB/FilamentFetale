@@ -1,6 +1,6 @@
 import numpy as np
+import torch
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 from tqdm import tqdm
 from numba import jit
 from quantimpy import minkowski as mk
@@ -8,14 +8,14 @@ from quantimpy import minkowski as mk
 # Parameters
 volume_size = 3  # Number of sub-cubes along each dimension
 sub_cube_size = 20   # Size of each sub-cube in the volume
-ball_radius_list = [0.5 + i * 0.5 for i in range(50)]  # List of ball radii to test
+ball_radius_list = [0.5 + i * 0.5 for i in range(200)]  # List of ball radii to test
 
 def add_balls(volume, sub_cube_size, ball_radius):
     """
     Add spherical balls to the 3D volume.
 
     Parameters:
-    - volume: 3D numpy array representing the volume
+    - volume: 3D torch tensor representing the volume
     - sub_cube_size: Size of each sub-cube
     - ball_radius: Radius of the balls to be added
 
@@ -23,22 +23,32 @@ def add_balls(volume, sub_cube_size, ball_radius):
     - Updated volume with balls added
     """
     # Create a grid of coordinates for the entire volume
-    z, y, x = np.indices(volume.shape)
+    z, y, x = torch.meshgrid(
+        torch.arange(volume.shape[0], device=volume.device),
+        torch.arange(volume.shape[1], device=volume.device),
+        torch.arange(volume.shape[2], device=volume.device),
+        indexing='ij'
+    )
 
     # Compute the centers of each sub-cube in the volume
-    centers = np.array([
-        (i * sub_cube_size + sub_cube_size // 2, 
-         j * sub_cube_size + sub_cube_size // 2, 
-         k * sub_cube_size + sub_cube_size // 2) 
-        for i in range(volume_size) 
-        for j in range(volume_size) 
-        for k in range(volume_size)
-    ])
+    volume_size = volume.shape[0] // sub_cube_size
+    centers = torch.stack(
+        [
+            torch.arange(sub_cube_size // 2, volume_size * sub_cube_size, sub_cube_size, device=volume.device),
+            torch.arange(sub_cube_size // 2, volume_size * sub_cube_size, sub_cube_size, device=volume.device),
+            torch.arange(sub_cube_size // 2, volume_size * sub_cube_size, sub_cube_size, device=volume.device)
+        ],
+        dim=1
+    ).view(-1, 3)
 
     # For each center, mark the volume within the ball radius as True
     for center_x, center_y, center_z in centers:
+        center_x = int(center_x.item())
+        center_y = int(center_y.item())
+        center_z = int(center_z.item())
+        
         # Compute distance from each point in the volume to the center
-        dist_from_center = np.sqrt((x - center_x)**2 + (y - center_y)**2 + (z - center_z)**2)
+        dist_from_center = torch.sqrt((x - center_x).float()**2 + (y - center_y).float()**2 + (z - center_z).float()**2)
         # Set the points within the ball radius to True
         volume[dist_from_center <= ball_radius] = True
 
@@ -50,48 +60,25 @@ def compute_minkowski_functionals(ball_radius):
 
     Parameters:
     - ball_radius: Radius of the balls to be added
+    - volume_size: Size of the volume (number of sub-cubes)
+    - sub_cube_size: Size of each sub-cube
 
     Returns:
     - Minkowski functionals computed for the volume
     """
     # Initialize a 3D volume with all False values
     volume_shape = (volume_size * sub_cube_size, volume_size * sub_cube_size, volume_size * sub_cube_size)
-    volume = np.zeros(volume_shape, dtype=bool)
+    volume = torch.zeros(volume_shape, dtype=torch.bool, device='cpu')
 
     # Add balls to the volume
     volume = add_balls(volume, sub_cube_size, ball_radius)
-
-    plot_3d_volume(volume)
     
-    # Compute the Minkowski functionals for the volume
-    minkowski_functionals = mk.functionals(volume)
+    # Assuming `mk.functionals` is a function that can handle PyTorch tensors, use it here.
+    # If not, you might need to implement a PyTorch-compatible version.
+    minkowski_functionals = mk.functionals(volume.numpy())
 
     return minkowski_functionals
 
-def plot_3d_volume(volume):
-    """
-    Visualize the 3D volume with scatter plot.
-
-    Parameters:
-    - volume: 3D numpy array representing the volume
-    """
-    fig = plt.figure(figsize=(12, 10))
-
-    # Create 3D scatter plot
-    ax = fig.add_subplot(111, projection='3d')
-
-    # Get coordinates of the non-zero (True) values in the volume
-    x, y, z = np.where(volume)
-
-    # Scatter plot
-    ax.scatter(x, y, z, c='gray', marker='o', s=1)  # Adjust 's' for size of the points
-
-    ax.set_xlabel('X axis')
-    ax.set_ylabel('Y axis')
-    ax.set_zlabel('Z axis')
-    ax.set_title('3D Volume Visualization with Balls')
-
-    plt.show()
 
 # Initialize lists to store Minkowski functionals for each ball radius
 minkowski_functionals = [[] for _ in range(4)]  # Assuming there are 4 functionals
@@ -118,4 +105,3 @@ for i, ax in enumerate(axs.flat):
 # Adjust layout to prevent overlap
 plt.tight_layout()
 plt.show()
-

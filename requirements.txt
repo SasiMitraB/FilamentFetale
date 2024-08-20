@@ -1,0 +1,8 @@
+numpy
+tqdm
+pandas
+matplotlib
+scipy
+quantimpy
+numba
+requests
