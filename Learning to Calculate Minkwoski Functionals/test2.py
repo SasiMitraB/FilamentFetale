@@ -1,3 +1,6 @@
+#Tried to implement a version of a Notification system for the discord. 
+#And an implementation using Pytorch instead of numpy.
+#The code is not working as intended, but may have useful functions for later.
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm

@@ -1,57 +1,84 @@
+"""
+Script Name: radius_variance.py
+Description:
+    This script generates 3D volumes with spherical regions (balls) and computes Minkowski functionals
+    for varying ball radii. The script visualizes each 3D volume and plots the computed functionals
+    against ball radii.
+
+    Key steps include:
+    1. Generating a 3D volume with balls of different radii.
+    2. Computing Minkowski functionals for the generated volume.
+    3. Plotting the Minkowski functionals as a function of ball radius.
+
+    When run, the script will:
+    - Print the randomly generated center coordinates for the balls.
+    - Compute and plot the Minkowski functionals (up to four) as a function of ball radius.
+    - Display 2D plots of each functional in a 2x2 grid of subplots.
+
+Usage:
+    To execute this script, run it with Python from the command line:
+    python radius_variance.py
+
+Requirements:
+    Ensure the following Python packages are installed:
+    - numpy
+    - matplotlib
+    - tqdm
+    - numba
+    - quantimpy
+
+Notes:
+    - The script generates a random center for the balls within a 200x200x200 grid.
+    - It tests ball radii from 3 to 75 in steps of 3.
+    - The `quantimpy` library's `minkowski` module is used to compute Minkowski functionals.
+
+Date:
+    August 22, 2024
+"""
+
 import numpy as np
-import torch
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from numba import jit
 from quantimpy import minkowski as mk
 
 # Parameters
-volume_size = 3  # Number of sub-cubes along each dimension
-sub_cube_size = 20   # Size of each sub-cube in the volume
-ball_radius_list = [0.5 + i * 0.5 for i in range(200)]  # List of ball radii to test
+grid_dimensions = 200 #Number of grid points along each dimension
+ball_radius_list = [3 + i * 3 for i in range(25)]  # List of ball radii to test
+#Randomly Generated Center in the grid for the ball
+center = np.random.randint(0, grid_dimensions, size=3)
+print(center)
 
-def add_balls(volume, sub_cube_size, ball_radius):
+
+def add_balls(center, radius):
     """
-    Add spherical balls to the 3D volume.
+    Takes input of the center and radius, adds a ball at the specified center and radius, and returns the volume.
 
     Parameters:
-    - volume: 3D torch tensor representing the volume
-    - sub_cube_size: Size of each sub-cube
-    - ball_radius: Radius of the balls to be added
+    - center (tuple): The coordinates of the center of the ball in the form (x, y, z).
+    - radius (float): The radius of the ball.
 
     Returns:
-    - Updated volume with balls added
+    - volume (ndarray): A 3D numpy array with dimensions (grid_dimensions, grid_dimensions, grid_dimensions).
+                       The array represents a volume where everything is marked as False except for the positions
+                       within the ball, which are marked as True.
+
     """
-    # Create a grid of coordinates for the entire volume
-    z, y, x = torch.meshgrid(
-        torch.arange(volume.shape[0], device=volume.device),
-        torch.arange(volume.shape[1], device=volume.device),
-        torch.arange(volume.shape[2], device=volume.device),
-        indexing='ij'
-    )
-
-    # Compute the centers of each sub-cube in the volume
-    volume_size = volume.shape[0] // sub_cube_size
-    centers = torch.stack(
-        [
-            torch.arange(sub_cube_size // 2, volume_size * sub_cube_size, sub_cube_size, device=volume.device),
-            torch.arange(sub_cube_size // 2, volume_size * sub_cube_size, sub_cube_size, device=volume.device),
-            torch.arange(sub_cube_size // 2, volume_size * sub_cube_size, sub_cube_size, device=volume.device)
-        ],
-        dim=1
-    ).view(-1, 3)
-
-    # For each center, mark the volume within the ball radius as True
-    for center_x, center_y, center_z in centers:
-        center_x = int(center_x.item())
-        center_y = int(center_y.item())
-        center_z = int(center_z.item())
-        
-        # Compute distance from each point in the volume to the center
-        dist_from_center = torch.sqrt((x - center_x).float()**2 + (y - center_y).float()**2 + (z - center_z).float()**2)
-        # Set the points within the ball radius to True
-        volume[dist_from_center <= ball_radius] = True
-
+    
+    volume = np.zeros((grid_dimensions, grid_dimensions, grid_dimensions), dtype=bool)
+    x, y, z = center
+    r = radius
+    # Create a grid of coordinates
+    coords = np.indices((grid_dimensions, grid_dimensions, grid_dimensions))
+    
+    # Calculate the squared distance from the center (x, y, z)
+    squared_distances = (coords[0] - x) ** 2 + (coords[1] - y) ** 2 + (coords[2] - z) ** 2
+    
+    # Create a mask where the squared distance is less than or equal to r^2
+    mask = squared_distances <= r ** 2
+    
+    # Apply the mask to the volume array
+    volume[mask] = True
     return volume
 
 def compute_minkowski_functionals(ball_radius):
@@ -60,25 +87,19 @@ def compute_minkowski_functionals(ball_radius):
 
     Parameters:
     - ball_radius: Radius of the balls to be added
-    - volume_size: Size of the volume (number of sub-cubes)
-    - sub_cube_size: Size of each sub-cube
 
     Returns:
     - Minkowski functionals computed for the volume
     """
-    # Initialize a 3D volume with all False values
-    volume_shape = (volume_size * sub_cube_size, volume_size * sub_cube_size, volume_size * sub_cube_size)
-    volume = torch.zeros(volume_shape, dtype=torch.bool, device='cpu')
+    
 
     # Add balls to the volume
-    volume = add_balls(volume, sub_cube_size, ball_radius)
+    volume = add_balls(center, ball_radius)
     
-    # Assuming `mk.functionals` is a function that can handle PyTorch tensors, use it here.
-    # If not, you might need to implement a PyTorch-compatible version.
-    minkowski_functionals = mk.functionals(volume.numpy())
+    # Compute the Minkowski functionals for the volume
+    minkowski_functionals = mk.functionals(volume)
 
     return minkowski_functionals
-
 
 # Initialize lists to store Minkowski functionals for each ball radius
 minkowski_functionals = [[] for _ in range(4)]  # Assuming there are 4 functionals
