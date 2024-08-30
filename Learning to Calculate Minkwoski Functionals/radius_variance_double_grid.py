@@ -51,8 +51,8 @@ from quantimpy import minkowski as mk
 
 # Parameters
 volume_size = 3  # Number of sub-cubes along each dimension
-sub_cube_size = 150   # Size of each sub-cube in the volume
-ball_radius_list = [3 + i * 3 for i in range(150)]  # List of ball radii to test
+sub_cube_size = 30   # Size of each sub-cube in the volume
+ball_radius_list = [0.5 + i * 0.5 for i in range(150)]  # List of ball radii to test
 
 def add_balls(volume, sub_cube_size, ball_radius):
     """
