@@ -88,7 +88,7 @@ def calculate_distance_and_set_position(i, j, k, x, y, z, r, volume):
 
 
 
-def add_balls(center, radius):
+def add_balls(center, radius, volume):
     """
     Takes input of the center and radius, adds a ball at the specified center and radius, and returns the volume.
 
@@ -103,11 +103,9 @@ def add_balls(center, radius):
 
     """
     
-    volume = np.zeros((grid_dimensions, grid_dimensions, grid_dimensions), dtype=bool)
+
     x, y, z = center
     r = radius
-    # Create a boolean numpy array to represent the volume
-    volume = np.zeros((grid_dimensions, grid_dimensions, grid_dimensions), dtype=bool)
     
     # Iterate over each position in the volume
     for i in tqdm(range(grid_dimensions)):
@@ -115,6 +113,36 @@ def add_balls(center, radius):
             for k in range(grid_dimensions):
                 calculate_distance_and_set_position(i, j, k, x, y, z, r, volume)
     return volume
+
+def plot_volume(volume):
+    """
+    Plot the given volume object in a 3D scatter plot.
+    Parameters:
+    volume (ndarray): A 3D numpy array representing the volume.
+    Returns:
+    None
+    """
+    # Plot the volume object in 3D
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Get the indices of the True values in the volume
+    indices = np.where(volume)
+
+    # Plot the True values as scatter points
+    ax.scatter(indices[0], indices[1], indices[2], c='b', marker='o')
+
+    # Set the plot limits
+    ax.set_xlim(0, grid_dimensions)
+    ax.set_ylim(0, grid_dimensions)
+    ax.set_zlim(0, grid_dimensions)
+
+    # Set the plot labels
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    plt.show()
     
 def compute_minkowski_functionals(ball_radius):
     """
@@ -127,27 +155,39 @@ def compute_minkowski_functionals(ball_radius):
     - Minkowski functionals computed for the volume
     """
     
+    volume = np.zeros((grid_dimensions, grid_dimensions, grid_dimensions), dtype=bool)
 
     # Add balls to the volume
-    volume = add_balls(center, ball_radius)
+    for center in list_of_centers:
+        volume = add_balls(center, ball_radius, volume)
     
     # Compute the Minkowski functionals for the volume
     minkowski_functionals = mk.functionals(volume)
 
     m0, m1, m2, m3 = minkowski_functionals
-    v0 = m0 
-    v1 = m1 * 4 / 3
-    v2 = m2 * 2 * np.pi / 3
-    v3 = m3 * 4 * np.pi / 3
+
+    v0 = m0 * (unit_grid_dimension**3)  #Unit Grid Dimension raised to 3
+    v1 = (m1 * 4 / 3) * (unit_grid_dimension**2) #Unit Grid Dimension raised to 2
+    v2 = (m2 * 2 * np.pi / 3) * unit_grid_dimension #Unit Grid Dimension raised to 1
+    v3 = m3 * 4 * np.pi / 3 #Dimensionless Constant
     
     return v0, v1, v2, v3
 
-grid_dimensions = 300 #Number of grid points in each dimension
-center = [grid_dimensions//2, grid_dimensions//2, grid_dimensions//2] #Center of the grid
+unit_grid_dimension = 1 #Unit grid dimension in meters
+length_of_grid = 300 #Length of the grid in meters
+radius = 35 #Radius of the sphere in meters
+number_of_balls = 1 #Number of balls to be placed in the grid
 
-radius = 75 #Radius of the sphere
 
-minkowski_functionals = compute_minkowski_functionals(radius)
+
+
+grid_dimensions = int(length_of_grid / unit_grid_dimension) #Number of grid boxes in each dimension
+radius_in_grid = radius / unit_grid_dimension
+#Randomly Generating number_of_balls centers to place the balls
+list_of_centers = [[np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10)] for i in range(number_of_balls)]
+
+
+minkowski_functionals = compute_minkowski_functionals(radius_in_grid)
 
 print("V_0: ", minkowski_functionals[0])
 print("V_1: ", minkowski_functionals[1])
