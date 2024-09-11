@@ -1,100 +1,149 @@
-#test.py. This is the script where i'm testing the different python functions for the main thing. 
-#Once i've ensured things work I move it to a dedicated python script with proper documentation.
-"""
-Script Name: radius_variance_double_grid.py
-Description:
-    This script generates a 3D volume consisting of multiple sub-cubes and adds spherical regions (balls)
-    to this volume. It computes Minkowski functionals for different ball radii and visualizes the results.
-
-    Key steps include:
-    1. Initializing a 3D volume with specified dimensions.
-    2. Adding spherical balls to the volume.
-    3. Computing Minkowski functionals for the volume.
-    4. Plotting the computed functionals against the ball radii.
-    
-    When run, the script will:
-    - Compute Minkowski functionals for ball radii ranging from 3 to 450 in steps of 3.
-    - Display 2D plots of the computed functionals in a 2x2 grid of subplots.
-
-Parameters:
-    - volume_size (int): Number of sub-cubes along each dimension of the 3D volume.
-    - sub_cube_size (int): Size of each sub-cube in the volume.
-    - ball_radius_list (list of int): List of ball radii to test.
-
-Functions:
-    - add_balls(volume, sub_cube_size, ball_radius): Adds spherical balls to the given 3D volume.
-    - compute_minkowski_functionals(ball_radius): Computes Minkowski functionals for the volume with balls of the given radius.
-
-Usage:
-    To execute this script, run it with Python from the command line:
-    python radius_variance_double_grid.py
-
-Requirements:
-    Ensure the following Python packages are installed:
-    - numpy
-    - matplotlib
-    - tqdm
-    - quantimpy
-
-Notes:
-    - The script creates a volume consisting of `volume_size` sub-cubes, each with a size of `sub_cube_size`.
-    - Balls are added at the center of each sub-cube.
-    - The `quantimpy` library's `minkowski` module is used to compute Minkowski functionals.
-
-Date:
-    August 22, 2024
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from numba import jit
 from quantimpy import minkowski as mk
+import concurrent.futures
 
-# Parameters
-volume_size = 3  # Number of sub-cubes along each dimension
-sub_cube_size = 200   # Size of each sub-cube in the volume
-ball_radius_list = [3 + i * 3 for i in range(150)]  # List of ball radii to test
 
-# Parameters
-#volume_size = 3  # Number of sub-cubes along each dimension
-#sub_cube_size = 30   # Size of each sub-cube in the volume
-#ball_radius_list = [0.5 + i * 0.5 for i in range(150)]  # List of ball radii to test
-
-def add_balls(volume, sub_cube_size, ball_radius):
+def calculate_shapefinders(minkowski_functionals):
     """
-    Add spherical balls to the 3D volume.
+    Calculates the shapefinders based on the given Minkowski functionals.
+    Reference:
+    - Section 2.5.1 of Dr Amit's thesis
+    Parameters:
+    - minkowski_functionals (list): A list of four Minkowski functionals [v_0, v_1, v_2, v_3].
+    Returns:
+    - thickness (float): The thickness shapefinder.
+    - width (float): The width shapefinder.
+    - length (float): The length shapefinder.
+    """
+
+    v_0, v_1, v_2, v_3 = minkowski_functionals
+
+    l1 = v_0 / (2 * v_1)
+    l2 = 2*v_1 / (np.pi * v_2)
+    l3 = 3 * v_2 / (4 * v_3)
+
+    # Sorting the shapefinders in descending order
+    shapefinders = [l1, l2, l3]
+    shapefinders.sort()
+    thickness, width, length = shapefinders
+
+    return thickness, width, length
+
+@jit(nopython=True)
+def planarity(thickness, width):
+    """
+    Calculates the planarity of an object based on its thickness and width.
+    Parameters:
+    thickness (float): The thickness of the object.
+    width (float): The width of the object.
+    Returns:
+    float: The planarity value, which is a measure of how flat the object is.
+    Reference:
+    - Section 2.5.1 of Dr Amit's thesis
+    """
+
+    p = (width - thickness) / (width + thickness)
+    return p
+
+@jit(nopython=True)
+def filamentarity(width, length):
+    """
+    Calculate the filamentarity of an object.
 
     Parameters:
-    - volume: 3D numpy array representing the volume
-    - sub_cube_size: Size of each sub-cube
-    - ball_radius: Radius of the balls to be added
+    width (float): The width of the object.
+    length (float): The length of the object.
 
     Returns:
-    - Updated volume with balls added
+    float: The filamentarity value of the object.
     """
-    # Create a grid of coordinates for the entire volume
-    z, y, x = np.indices(volume.shape)
 
-    # Compute the centers of each sub-cube in the volume
-    centers = np.array([
-        (i * sub_cube_size + sub_cube_size // 2, 
-         j * sub_cube_size + sub_cube_size // 2, 
-         k * sub_cube_size + sub_cube_size // 2) 
-        for i in range(volume_size) 
-        for j in range(volume_size) 
-        for k in range(volume_size)
-    ])
+    f = (length - width) / (length + width)
+    return f
 
-    # For each center, mark the volume within the ball radius as True
-    for center_x, center_y, center_z in centers:
-        # Compute distance from each point in the volume to the center
-        dist_from_center = np.sqrt((x - center_x)**2 + (y - center_y)**2 + (z - center_z)**2)
-        # Set the points within the ball radius to True
-        volume[dist_from_center <= ball_radius] = True
+@jit(nopython=True)
+def calculate_distance_and_set_position(i, j, k, x, y, z, r, volume):
+    """
+    Calculate the distance between a point and the center of the sphere and set the position in the volume.
 
+    Parameters:
+    - i (int): The x-coordinate of the point.
+    - j (int): The y-coordinate of the point.
+    - k (int): The z-coordinate of the point.
+    - x (int): The x-coordinate of the center of the sphere.
+    - y (int): The y-coordinate of the center of the sphere.
+    - z (int): The z-coordinate of the center of the sphere.
+    - r (int): The radius of the sphere.
+    - volume (ndarray): A 3D numpy array with dimensions (grid_dimensions, grid_dimensions, grid_dimensions).
+                       The array represents a volume where everything is marked as False except for the positions
+                       within the ball, which are marked as True.
+    """
+
+    distance = np.sqrt((i - x) ** 2 + (j - y) ** 2 + (k - z) ** 2)
+    if distance <= r:
+        volume[i, j, k] = True
+
+
+
+def add_balls(center, radius, volume):
+    """
+    Takes input of the center and radius, adds a ball at the specified center and radius, and returns the volume.
+
+    Parameters:
+    - center (tuple): The coordinates of the center of the ball in the form (x, y, z).
+    - radius (float): The radius of the ball.
+
+    Returns:
+    - volume (ndarray): A 3D numpy array with dimensions (grid_dimensions, grid_dimensions, grid_dimensions).
+                       The array represents a volume where everything is marked as False except for the positions
+                       within the ball, which are marked as True.
+
+    """
+    
+
+    x, y, z = center
+    r = radius
+    
+    # Iterate over each position in the volume
+    for i in tqdm(range(grid_dimensions)):
+        for j in range(grid_dimensions):
+            for k in range(grid_dimensions):
+                calculate_distance_and_set_position(i, j, k, x, y, z, r, volume)
     return volume
 
+def plot_volume(volume):
+    """
+    Plot the given volume object in a 3D scatter plot.
+    Parameters:
+    volume (ndarray): A 3D numpy array representing the volume.
+    Returns:
+    None
+    """
+    # Plot the volume object in 3D
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    # Get the indices of the True values in the volume
+    indices = np.where(volume)
+
+    # Plot the True values as scatter points
+    ax.scatter(indices[0], indices[1], indices[2], c='b', marker='o')
+
+    # Set the plot limits
+    ax.set_xlim(0, grid_dimensions)
+    ax.set_ylim(0, grid_dimensions)
+    ax.set_zlim(0, grid_dimensions)
+
+    # Set the plot labels
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    plt.show()
+    
 def compute_minkowski_functionals(ball_radius):
     """
     Create a volume with balls and compute the Minkowski functionals.
@@ -105,40 +154,38 @@ def compute_minkowski_functionals(ball_radius):
     Returns:
     - Minkowski functionals computed for the volume
     """
-    # Initialize a 3D volume with all False values
-    volume_shape = (volume_size * sub_cube_size, volume_size * sub_cube_size, volume_size * sub_cube_size)
-    volume = np.zeros(volume_shape, dtype=bool)
+    
+    volume = np.zeros((grid_dimensions, grid_dimensions, grid_dimensions), dtype=bool)
 
     # Add balls to the volume
-    volume = add_balls(volume, sub_cube_size, ball_radius)
-
+    for center in list_of_centers:
+        volume = add_balls(center, ball_radius, volume)
+    
     # Compute the Minkowski functionals for the volume
     minkowski_functionals = mk.functionals(volume)
 
-    return minkowski_functionals
+    m0, m1, m2, m3 = minkowski_functionals
 
-# Initialize lists to store Minkowski functionals for each ball radius
-minkowski_functionals = [[] for _ in range(4)]  # Assuming there are 4 functionals
+    v0 = m0 * (unit_grid_dimension**3)  #Unit Grid Dimension raised to 3
+    v1 = (m1 * 4 / 3) * (unit_grid_dimension**2) #Unit Grid Dimension raised to 2
+    v2 = (m2 * 2 * np.pi / 3) * unit_grid_dimension #Unit Grid Dimension raised to 1
+    v3 = m3 * 4 * np.pi / 3 #Dimensionless Constant
+    
+    return v0, v1, v2, v3
 
-# Compute Minkowski functionals for each radius in the list
-for ball_radius in tqdm(ball_radius_list):
-    functionals = compute_minkowski_functionals(ball_radius)  # Get all four functionals
-    for i in range(4):
-        minkowski_functionals[i].append(functionals[i])
+unit_grid_dimension = 1 #Unit grid dimension in meters
+length_of_grid = 300 #Length of the grid in meters
+radius_list = [10 + i for i in range(50)] #Radius of the sphere in meters
+number_of_balls = 5 #Number of balls to be placed in the grid
 
-# Plotting the Minkowski functionals in separate subplots
-fig, axs = plt.subplots(2, 2, figsize=(12, 10))  # Create a 2x2 grid of subplots
+#Randomly Generating number_of_balls centers to place the balls
+list_of_centers = [[np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10)] for i in range(number_of_balls)]
+    
 
-# Titles for each subplot
-titles = ['Functional 1', 'Functional 2', 'Functional 3', 'Functional 4']
+for radius in radius_list:
+    grid_dimensions = int(length_of_grid / unit_grid_dimension) #Number of grid boxes in each dimension
+    radius_in_grid = radius / unit_grid_dimension
+    #list_of_centers = [[grid_dimensions//2, grid_dimensions//2, grid_dimensions//2]]
 
-# Plot each Minkowski functional
-for i, ax in enumerate(axs.flat):
-    ax.plot(ball_radius_list, minkowski_functionals[i], marker='o')
-    ax.set_xlabel('Ball Radius')
-    ax.set_ylabel(f'Minkowski Functional {i + 1}')
-    ax.set_title(titles[i])
+    minkowski_functionals = compute_minkowski_functionals(radius_in_grid)
 
-# Adjust layout to prevent overlap
-plt.tight_layout()
-plt.show()

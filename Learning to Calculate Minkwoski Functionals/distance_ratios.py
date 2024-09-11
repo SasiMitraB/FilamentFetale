@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from numba import jit
 from quantimpy import minkowski as mk
-import concurrent.futures
 
 
 def calculate_shapefinders(minkowski_functionals):
@@ -65,7 +64,7 @@ def filamentarity(width, length):
     return f
 
 @jit(nopython=True)
-def calculate_distance_and_set_position(i, j, k, x, y, z, r, volume):
+def calculate_distance_and_set_position(i, j, k, x, y, z, r, grid):
     """
     Calculate the distance between a point and the center of the sphere and set the position in the volume.
 
@@ -84,11 +83,11 @@ def calculate_distance_and_set_position(i, j, k, x, y, z, r, volume):
 
     distance = np.sqrt((i - x) ** 2 + (j - y) ** 2 + (k - z) ** 2)
     if distance <= r:
-        volume[i, j, k] = True
+        grid[i, j, k] = True
 
 
 
-def add_balls(center, radius, volume):
+def add_balls(center, radius, grid):
     """
     Takes input of the center and radius, adds a ball at the specified center and radius, and returns the volume.
 
@@ -97,13 +96,11 @@ def add_balls(center, radius, volume):
     - radius (float): The radius of the ball.
 
     Returns:
-    - volume (ndarray): A 3D numpy array with dimensions (grid_dimensions, grid_dimensions, grid_dimensions).
+    - grid (ndarray): A 3D numpy array with dimensions (grid_dimensions, grid_dimensions, grid_dimensions).
                        The array represents a volume where everything is marked as False except for the positions
                        within the ball, which are marked as True.
 
     """
-    
-
     x, y, z = center
     r = radius
     
@@ -111,8 +108,8 @@ def add_balls(center, radius, volume):
     for i in tqdm(range(grid_dimensions)):
         for j in range(grid_dimensions):
             for k in range(grid_dimensions):
-                calculate_distance_and_set_position(i, j, k, x, y, z, r, volume)
-    return volume
+                calculate_distance_and_set_position(i, j, k, x, y, z, r, grid)
+    return grid
 
 def plot_volume(volume):
     """
@@ -173,19 +170,21 @@ def compute_minkowski_functionals(ball_radius):
     
     return v0, v1, v2, v3
 
-unit_grid_dimension = 1 #Unit grid dimension in meters
+# Define the grid dimensions and the radius of the sphere
+grid_dimensions = 500 #No of grid boxes in each dimensions
 length_of_grid = 300 #Length of the grid in meters
 radius = 35 #Radius of the sphere in meters
+
 number_of_balls = 1 #Number of balls to be placed in the grid
 
 
 
+unit_grid_dimension = length_of_grid / grid_dimensions
 
-grid_dimensions = int(length_of_grid / unit_grid_dimension) #Number of grid boxes in each dimension
 radius_in_grid = radius / unit_grid_dimension
 #Randomly Generating number_of_balls centers to place the balls
-list_of_centers = [[np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10)] for i in range(number_of_balls)]
-
+#list_of_centers = [[np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10)] for i in range(number_of_balls)]
+list_of_centers = [[grid_dimensions//2, grid_dimensions//2, grid_dimensions//2]]
 
 minkowski_functionals = compute_minkowski_functionals(radius_in_grid)
 
@@ -194,3 +193,9 @@ print("V_1: ", minkowski_functionals[1])
 print("V_2: ", minkowski_functionals[2])
 print("V_3: ", minkowski_functionals[3])
 
+
+print("Shapefinders: ", calculate_shapefinders(minkowski_functionals))
+thickness, width, length = calculate_shapefinders(minkowski_functionals)
+
+print("Planarity: ", planarity(thickness, width))
+print("Filamentarity: ", filamentarity(width, length))
