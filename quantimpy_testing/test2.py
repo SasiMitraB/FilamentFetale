@@ -1,134 +1,58 @@
-#Tried to implement a version of a Notification system for the discord. 
-#And an implementation using Pytorch instead of numpy.
-#The code is not working as intended, but may have useful functions for later.
 import numpy as np
-import matplotlib.pyplot as plt
-from tqdm import tqdm
 from numba import jit
-from quantimpy import minkowski as mk
-import requests
-import torch
 
-
-def send_discord_notification(webhook_url, message):
-    payload = {
-        'content': message
-    }
-    response = requests.post(webhook_url, json=payload)
-    if response.status_code == 204:
-        print("Notification sent successfully!")
-    else:
-        print(f"Failed to send notification. Status code: {response.status_code}")
-
-# Replace with your Discord webhook URL
-webhook_url = 'https://discord.com/api/webhooks/1275399280340897807/hRdISUa2AYdqB1jYJvClv6ENTgJWdgVSl-bHcdJ_-_i5zN56YyODlkBuD3GOPNwCdKaA'
-
-def compute_minkowski_functionals(ball_radius):
+@jit(nopython=True)
+def calculate_distance_and_set_position(i, j, k, x, y, z, r, grid):
     """
-    Create a volume with balls and compute the Minkowski functionals.
+    Calculate the distance between a point and the center of the sphere and set the position in the volume.
 
     Parameters:
-    - ball_radius: Radius of the balls to be added
-
-    Returns:
-    - Minkowski functionals computed for the volume
+    - i (int): The x-coordinate of the point.
+    - j (int): The y-coordinate of the point.
+    - k (int): The z-coordinate of the point.
+    - x (int): The x-coordinate of the center of the sphere.
+    - y (int): The y-coordinate of the center of the sphere.
+    - z (int): The z-coordinate of the center of the sphere.
+    - r (int): The radius of the sphere.
+    - volume (ndarray): A 3D numpy array with dimensions (grid_dimensions, grid_dimensions, grid_dimensions).
+                       The array represents a volume where everything is marked as False except for the positions
+                       within the ball, which are marked as True.
     """
 
-    # Add balls to the volume
-    add_balls(volume, sub_cube_size, ball_radius)
+    distance = np.sqrt((i - x) ** 2 + (j - y) ** 2 + (k - z) ** 2)
+    if distance <= r:
+        grid[i, j, k] = True
     
-    # Compute the Minkowski functionals for the volume
-    minkowski_functionals = mk.functionals(volume.numpy())
 
-    return minkowski_functionals
 
-def add_balls(volume, sub_cube_size, ball_radius):
+def add_balls(center, radius, grid):
     """
-    Add spherical balls to the 3D volume and return the intersection with the original volume.
-
-    Parameters:
-    - volume: 3D tensor representing the volume (initially representing the object)
-    - sub_cube_size: Size of each sub-cube
-    - ball_radius: Radius of the balls to be added
-
+    Add balls to the grid around the specified center with the given radius.
+    Args:
+        center (tuple): The coordinates of the center of the balls (x, y, z).
+        radius (int): The radius of the balls.
+        grid (list): The grid to add the balls to.
     Returns:
-    - Updated volume with the intersection of the original volume and the balls
+        list: The updated grid with the added balls.
     """
-    # Create a grid of coordinates for the entire volume
-    z, y, x = torch.meshgrid(torch.arange(volume.shape[0]), torch.arange(volume.shape[1]), torch.arange(volume.shape[2]))
+    x_center, y_center, z_center = center
 
-    # Compute the centers of each sub-cube in the volume
-    centers = torch.tensor([
-        (i * sub_cube_size + sub_cube_size // 2, 
-         j * sub_cube_size + sub_cube_size // 2, 
-         k * sub_cube_size + sub_cube_size // 2) 
-        for i in range(volume.shape[0] // sub_cube_size) 
-        for j in range(volume.shape[1] // sub_cube_size) 
-        for k in range(volume.shape[2] // sub_cube_size)
-    ])
-
-    # Create an empty volume to accumulate the balls
-    balls_volume = torch.zeros_like(volume, dtype=torch.bool)
-
-    # For each center, mark the volume within the ball radius as True in balls_volume
-    for center_x, center_y, center_z in centers:
-        # Compute distance from each point in the volume to the center
-        dist_from_center = torch.sqrt((x - center_x)**2 + (y - center_y)**2 + (z - center_z)**2)
-        # Set the points within the ball radius to True in balls_volume
-        balls_volume[dist_from_center <= ball_radius] = True
-
-    # Return the intersection of the original volume and the balls_volume
-    intersection_volume =  volume & balls_volume
-
-    return intersection_volume
+    x_min = int(x_center - ((radius + 3)//1))
+    x_max = int(x_center + ((radius + 3)//1))
+    y_min = int(y_center - ((radius + 3)//1))
+    y_max = int(y_center + ((radius + 3)//1))
+    z_min = int(z_center - ((radius + 3)//1))
+    z_max = int(z_center + ((radius + 3)//1))
 
 
-# Parameters
-volume_size = 5  # Number of sub-cubes along each dimension
-sub_cube_size = 20   # Size of each sub-cube in the volume
-ball_radius_list = [0.5 + i * 0.5 for i in range(20)]  # List of ball radii to test
+    for i in tqdm(range(x_min, x_max)):
+        for j in range(y_min, y_max):
+            for k in range(z_min, z_max):
+                i = i % grid_dimensions
+                j = j % grid_dimensions
+                k = k % grid_dimensions
+                calculate_distance_and_set_position(i, j, k, x_center, y_center, z_center, radius, grid)
 
-# Create a 3D image (volume) with a spherical shape
-volume = torch.zeros([128, 128, 128], dtype=torch.bool)
-radius = 45
-center = (64, 64, 64)
-rr, cc, zz = torch.meshgrid(torch.arange(volume.shape[0]), torch.arange(volume.shape[1]), torch.arange(volume.shape[2]))
-mask = (rr - center[0])**2 + (cc - center[1])**2 + (zz - center[2])**2 <= radius**2
-volume[mask] = True
-
-
-
-# Initialize lists to store Minkowski functionals for each ball radius
-minkowski_functionals = [[] for _ in range(4)]  # Assuming there are 4 functionals
-
-# Compute Minkowski functionals for each radius in the list
-for ball_radius in tqdm(ball_radius_list, desc="Computing Minkowski Functionals", ascii=True):
-    functionals = compute_minkowski_functionals(ball_radius)  # Get all four functionals
-    for i in range(4):
-        minkowski_functionals[i].append(functionals[i])
-
-
-
-
-# Plotting the Minkowski functionals in separate subplots
-fig, axs = plt.subplots(2, 2, figsize=(12, 10))  # Create a 2x2 grid of subplots
-
-# Titles for each subplot
-titles = ['Functional 1', 'Functional 2', 'Functional 3', 'Functional 4']
-
-# Plot each Minkowski functional
-for i, ax in enumerate(axs.flat):
-    ax.plot(ball_radius_list, minkowski_functionals[i], marker='o')
-    ax.set_xlabel('Ball Radius')
-    ax.set_ylabel(f'Minkowski Functional {i + 1}')
-    ax.set_title(titles[i])
-
-# Adjust layout to prevent overlap
-plt.tight_layout()
-
-# Notify Discord once the code has finished running
-send_discord_notification(webhook_url, "Your Python script is done with the plotting.")
-
-plt.show()
+    return grid
 
 

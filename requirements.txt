@@ -1,8 +1,8 @@
-numpy
-tqdm
-pandas
-matplotlib
-scipy
+numpy==1.26.4
+tqdm==4.66.4
+pandas==2.2.2
+matplotlib==3.8.4
+scipy==1.13.1
 quantimpy
-numba
-requests
+numba==0.59.1
+requests==2.32.2
