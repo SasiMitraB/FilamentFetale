@@ -83,6 +83,9 @@ def calculate_distance_and_set_position(i, j, k, x, y, z, r, grid):
 
     distance = np.sqrt((i - x) ** 2 + (j - y) ** 2 + (k - z) ** 2)
     if distance <= r:
+        i = i % grid_dimensions
+        j = j % grid_dimensions
+        k = k % grid_dimensions
         grid[i, j, k] = True
     
 
@@ -110,9 +113,6 @@ def add_balls(center, radius, grid):
     for i in tqdm(range(x_min, x_max)):
         for j in range(y_min, y_max):
             for k in range(z_min, z_max):
-                i = i % grid_dimensions
-                j = j % grid_dimensions
-                k = k % grid_dimensions
                 calculate_distance_and_set_position(i, j, k, x_center, y_center, z_center, radius, grid)
 
     return grid
