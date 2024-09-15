@@ -3,6 +3,20 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from numba import jit
 from quantimpy import minkowski as mk
+import requests
+
+def send_discord_notification(webhook_url, message):
+    payload = {
+        'content': message
+    }
+    response = requests.post(webhook_url, json=payload)
+    if response.status_code == 204:
+        print("Notification sent successfully!")
+    else:
+        print(f"Failed to send notification. Status code: {response.status_code}")
+
+# Replace with your Discord webhook URL
+webhook_url = 'https://discord.com/api/webhooks/1275399280340897807/hRdISUa2AYdqB1jYJvClv6ENTgJWdgVSl-bHcdJ_-_i5zN56YyODlkBuD3GOPNwCdKaA'
 
 
 def calculate_shapefinders(minkowski_functionals):
@@ -179,8 +193,8 @@ def compute_minkowski_functionals(ball_radius):
     return v0, v1, v2, v3
 
 # Define the grid dimensions and the radius of the sphere
-grid_dimensions = 500 #No of grid boxes in each dimensions
-length_of_grid = 300 #Length of the grid in meters
+grid_dimensions = 1000 #No of grid boxes in each dimensions
+length_of_grid = 1 #Length of the grid in meters
 
 number_of_balls = 5 #Number of balls to be placed in the grid
 
@@ -192,7 +206,7 @@ list_of_centers = [[np.random.randint(2, grid_dimensions - 10), np.random.randin
 #list_of_centers = [[grid_dimensions//2, grid_dimensions//2, grid_dimensions//2]]
 
 
-list_of_radii = np.asarray([35 + i*5 for i in range(50)])
+list_of_radii = np.asarray([0.05 + i*0.01 for i in range(60)])
 list_of_radii_in_grid = list_of_radii / unit_grid_dimension
 
 minkowski_functionals = []
@@ -223,4 +237,8 @@ axs[1, 1].set_xlabel('Radius')
 axs[1, 1].set_ylabel('Minkowski Functional')
 
 plt.tight_layout()
+
+# Notify Discord once the code has finished running
+send_discord_notification(webhook_url, "Your Python script is done with the plotting.")
+
 plt.show()
