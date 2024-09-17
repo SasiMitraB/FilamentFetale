@@ -193,10 +193,10 @@ def compute_minkowski_functionals(ball_radius):
     return v0, v1, v2, v3
 
 # Define the grid dimensions and the radius of the sphere
-grid_dimensions = 1000 #No of grid boxes in each dimensions
+grid_dimensions = 800 #No of grid boxes in each dimensions
 length_of_grid = 1 #Length of the grid in meters
 
-number_of_balls = 5 #Number of balls to be placed in the grid
+number_of_balls = 40 #Number of balls to be placed in the grid
 
 unit_grid_dimension = length_of_grid / grid_dimensions
 #radius_in_grid = radius / unit_grid_dimension
