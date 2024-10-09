@@ -193,10 +193,10 @@ def compute_minkowski_functionals(ball_radius):
     return v0, v1, v2, v3
 
 # Define the grid dimensions and the radius of the sphere
-grid_dimensions = 800 #No of grid boxes in each dimensions
+grid_dimensions = 1200 #No of grid boxes in each dimensions
 length_of_grid = 1 #Length of the grid in meters
 
-number_of_balls = 40 #Number of balls to be placed in the grid
+number_of_balls = 60  #Number of balls to be placed in the grid
 
 unit_grid_dimension = length_of_grid / grid_dimensions
 #radius_in_grid = radius / unit_grid_dimension
@@ -204,6 +204,11 @@ unit_grid_dimension = length_of_grid / grid_dimensions
 #Randomly Generating number_of_balls centers to place the balls
 list_of_centers = [[np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10)] for i in range(number_of_balls)]
 #list_of_centers = [[grid_dimensions//2, grid_dimensions//2, grid_dimensions//2]]
+
+print('The length of the grid is', length_of_grid, 'meters')
+print('The Grid Resolution is', grid_dimensions)
+print('There are', number_of_balls, 'balls placed randomly in the volume')
+
 
 
 list_of_radii = np.asarray([0.05 + i*0.01 for i in range(60)])
@@ -240,5 +245,7 @@ plt.tight_layout()
 
 # Notify Discord once the code has finished running
 send_discord_notification(webhook_url, "Your Python script is done with the plotting.")
+
+plt.savefig('output_file.png')
 
 plt.show()
