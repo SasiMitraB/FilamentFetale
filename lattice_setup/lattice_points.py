@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 from numba import jit
-from quantimpy import minkowski as mk
 import requests
 
 def send_discord_notification(webhook_url, message, file_path=None):
@@ -130,12 +128,12 @@ def add_balls(center, radius, grid):
     """
     x_center, y_center, z_center = center
 
-    x_min = int(x_center - ((radius + 4)//1))
-    x_max = int(x_center + ((radius + 4)//1))
-    y_min = int(y_center - ((radius + 4)//1))
-    y_max = int(y_center + ((radius + 4)//1))
-    z_min = int(z_center - ((radius + 4)//1))
-    z_max = int(z_center + ((radius + 4)//1))
+    x_min = int(x_center - ((radius + 3)//1))
+    x_max = int(x_center + ((radius + 3)//1))
+    y_min = int(y_center - ((radius + 3)//1))
+    y_max = int(y_center + ((radius + 3)//1))
+    z_min = int(z_center - ((radius + 3)//1))
+    z_max = int(z_center + ((radius + 3)//1))
 
 
     for i in range(x_min, x_max):
@@ -145,30 +143,6 @@ def add_balls(center, radius, grid):
 
     return grid
 
-
-def add_balls_old(center, radius, grid):
-    """
-    Takes input of the center and radius, adds a ball at the specified center and radius, and returns the volume.
-
-    Parameters:
-    - center (tuple): The coordinates of the center of the ball in the form (x, y, z).
-    - radius (float): The radius of the ball.
-
-    Returns:
-    - grid (ndarray): A 3D numpy array with dimensions (grid_dimensions, grid_dimensions, grid_dimensions).
-                       The array represents a volume where everything is marked as False except for the positions
-                       within the ball, which are marked as True.
-
-    """
-    x, y, z = center
-    r = radius
-    
-    # Iterate over each position in the volume
-    for i in range(grid_dimensions):
-        for j in range(grid_dimensions):
-            for k in range(grid_dimensions):
-                calculate_distance_and_set_position(i, j, k, x, y, z, r, grid)
-    return grid
 
 
 def plot_volume(volume):
@@ -198,6 +172,11 @@ def plot_volume(volume):
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
+    webhook_url = 'https://discord.com/api/webhooks/1285587084073107517/aYMnqG6LogHVeuQf06esyKKGjUkZUvQp37Aej7pexoLz-JIrSUMJYNntyj0KPxhLx4an'
+    plt.savefig("spam_plot.png")
+    send_discord_notification(webhook_url=webhook_url,
+                              message="Spam Plot of the Volume",
+                              file_path='spam_plot.png')
 
     plt.show()
     
@@ -216,88 +195,55 @@ def compute_minkowski_functionals(ball_radius):
 
     # Add balls to the volume
     for center in list_of_centers:
-        volume = add_balls_old(center, ball_radius, volume)
+        volume = add_balls(center, ball_radius, volume)
     
-    # Compute the Minkowski functionals for the volume
-    minkowski_functionals = mk.functionals(volume)
-
-    m0, m1, m2, m3 = minkowski_functionals
-
-    v0 = m0 * (unit_grid_dimension**3)  #Unit Grid Dimension raised to 3
-    v1 = (m1 * 4 / 3) * (unit_grid_dimension**2) #Unit Grid Dimension raised to 2
-    v2 = (m2 * 2 * np.pi / 3) * unit_grid_dimension #Unit Grid Dimension raised to 1
-    v3 = m3 * 4 * np.pi / 3 #Dimensionless Constant
+    plot_volume(volume)
     
-    return v0, v1, v2, v3
+    return 1,2,3,4
 
 # Define the grid dimensions and the radius of the sphere
-grid_dimensions = 50 #No of grid boxes/points in each dimensions
+grid_dimensions = 500 #No of grid boxes in each dimensions
 length_of_grid = 1 #Length of the grid in meters
 
-number_of_balls = 1  #Number of balls to be placed in the grid
-
 unit_grid_dimension = length_of_grid / grid_dimensions
-#radius_in_grid = radius / unit_grid_dimension
 
-#Randomly Generating number_of_balls centers to place the balls
-list_of_centers = [[np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10), np.random.randint(2, grid_dimensions - 10)] for i in range(number_of_balls)]
-#list_of_centers = [[grid_dimensions//2, grid_dimensions//2, grid_dimensions//2]]
+
+#Generating a Lattice and Placing the balls in the Centers of the lattices
+lattice_dimensions = 3  # Number of lattice points per dimension
+# Calculate spacings
+spacing_lattice = length_of_grid / lattice_dimensions
+spacing_grid = length_of_grid / grid_dimensions
+
+# Generate lattice centers
+list_of_centers_lattice = []
+for i in range(lattice_dimensions):
+    for j in range(lattice_dimensions):
+        for k in range(lattice_dimensions):
+            center_lattice = [i * spacing_lattice + spacing_lattice / 2,
+                              j * spacing_lattice + spacing_lattice / 2,
+                              k * spacing_lattice + spacing_lattice / 2]
+            list_of_centers_lattice.append(center_lattice)
+
+# Convert lattice centers to grid coordinates
+list_of_centers_grid = []
+for center in list_of_centers_lattice:
+    center_grid = [int(center[0] / spacing_grid),
+                   int(center[1] / spacing_grid),
+                   int(center[2] / spacing_grid)]
+    list_of_centers_grid.append(center_grid)
+
+list_of_centers = list_of_centers_grid
+
+# Verify the number of generated centers
+number_of_balls = len(list_of_centers_grid)
+print(f"Number of balls: {number_of_balls}")
 
 print('The length of the grid is', length_of_grid, 'meters')
 print('The Grid Resolution is', grid_dimensions)
-print('There are', number_of_balls, 'balls placed randomly in the volume')
+print('There are', number_of_balls, 'balls placed in a lattice in the volume')
 
-radius_start = 0.05
-radius_end = 0.47
-no_of_radii = 50
-list_of_radii = np.linspace(radius_start, radius_end, no_of_radii )
+radius = 0.1 #Radius of the sphere in meters
 
-#list_of_radii = np.asarray([0.05 + i*0.01 for i in range(45)])
-list_of_radii_in_grid = list_of_radii / unit_grid_dimension
+radius_in_grid = radius / unit_grid_dimension
 
-minkowski_functionals = []
-
-for radius_in_grid in tqdm(list_of_radii_in_grid):
-    minkowski_functionals.append(compute_minkowski_functionals(radius_in_grid))
-
-fig, axs = plt.subplots(2, 2, figsize=(10, 8))
-
-axs[0, 0].plot(list_of_radii, [m[0] for m in minkowski_functionals], "o-")
-axs[0, 0].set_title('V0')
-axs[0, 0].set_xlabel('Radius')
-axs[0, 0].set_ylabel('Minkowski Functional')
-
-axs[0, 1].plot(list_of_radii, [m[1] for m in minkowski_functionals], "o-")
-axs[0, 1].set_title('V1')
-axs[0, 1].set_xlabel('Radius')
-axs[0, 1].set_ylabel('Minkowski Functional')
-
-axs[1, 0].plot(list_of_radii, [m[2] for m in minkowski_functionals], "o-")
-axs[1, 0].set_title('V2')
-axs[1, 0].set_xlabel('Radius')
-axs[1, 0].set_ylabel('Minkowski Functional')
-
-axs[1, 1].plot(list_of_radii, [m[3] for m in minkowski_functionals], "o-")
-axs[1, 1].set_title('V3')
-axs[1, 1].set_xlabel('Radius')
-axs[1, 1].set_ylabel('Minkowski Functional')
-
-plt.tight_layout()
-
-plt.savefig('output_file.png')
-
-# Notify Discord with the message and image file
-
-message = """
-Center Coordinates Generated Randomly
-Length of Grid: {length_of_grid} m
-Grid Resolution: {grid_dimensions} per dimension
-Unit Grid Box Size: {unit_grid_dimension} m
-Number of Balls Placed: {number_of_balls}
-""".format(length_of_grid=length_of_grid, grid_dimensions=grid_dimensions, 
-           unit_grid_dimension=unit_grid_dimension, number_of_balls=number_of_balls)
-
-
-send_discord_notification(webhook_url, message, "output_file.png")
-
-plt.show()
+minkowski_functionals = compute_minkowski_functionals(radius_in_grid)
