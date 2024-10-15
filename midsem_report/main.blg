@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d (TeX Live 2024)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: plain.bst
+Database file #1: references.bib
+You're missing a field name---line 79 of file references.bib
+ :  isbn2     = {978-1-4419-2369-1},  
+ :                                    % Softcover ISBN
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "1999PaperMinkowskiFunctionalsInCosmology"
+You've used 6 entries,
+            2118 wiz_defined-function locations,
+            540 strings with 5022 characters,
+and the built_in function-call counts, 1744 in all, are:
+= -- 166
+> -- 86
+< -- 0
++ -- 34
+- -- 28
+* -- 121
+:= -- 313
+add.period$ -- 19
+call.type$ -- 6
+change.case$ -- 31
+chr.to.int$ -- 0
+cite$ -- 6
+duplicate$ -- 61
+empty$ -- 135
+format.name$ -- 28
+if$ -- 354
+int.to.chr$ -- 0
+int.to.str$ -- 6
+missing$ -- 5
+newline$ -- 33
+num.names$ -- 12
+pop$ -- 31
+preamble$ -- 1
+purify$ -- 26
+quote$ -- 0
+skip$ -- 43
+stack$ -- 0
+substring$ -- 81
+swap$ -- 6
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 22
+warning$ -- 0
+while$ -- 15
+width$ -- 7
+write$ -- 68
+(There was 1 error message)

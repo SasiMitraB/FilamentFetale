@@ -1,0 +1,33 @@
+\begin{thebibliography}{1}
+
+\bibitem{adler_taylor_2007}
+Robert~J. Adler and Jonathan~E. Taylor.
+\newblock {\em Random Fields and Geometry}.
+\newblock Springer Monographs in Mathematics. Springer New York, NY, 1 edition, 2007.
+
+\bibitem{quantimpy_minkowski}
+Author Boeleman.
+\newblock Quantimpy: Minkowski functionals and functions, 2024.
+\newblock Accessed: 2024-10-13.
+
+\bibitem{boelens2021quantimpy}
+Arnout~M.P. Boelens and Hamdi~A. Tchelepi.
+\newblock Quantimpy: Minkowski functionals and functions with python.
+\newblock {\em SoftwareX}, 16:100823, 2021.
+
+\bibitem{Schmalzing1999}
+Jens Schmalzing, Thomas Buchert, Adrian~L. Melott, Varun Sahni, B.~S. Sathyaprakash, and Sergei~F. Shandarin.
+\newblock Disentangling the cosmic web. i. morphology of isodensity contours.
+\newblock {\em The Astrophysical Journal}, 513(1):L1--L4, 1999.
+
+\bibitem{AmitSetaThesis}
+Amit {Seta}.
+\newblock {\em {Cosmic ray propagation in turbulent galactic magnetic fields}}.
+\newblock PhD thesis, Newcastle University Upon Tyne, UK, January 2019.
+
+\bibitem{DataPaper}
+Amit {Seta} and Christoph {Federrath}.
+\newblock {Saturation mechanism of the fluctuation dynamo in supersonic turbulent plasmas}.
+\newblock {\em Physical Review Fluids}, 6(10):103701, October 2021.
+
+\end{thebibliography}

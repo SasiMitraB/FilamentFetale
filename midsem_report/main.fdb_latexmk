@@ -1,0 +1,23 @@
+# Fdb version 4
+["pdflatex"] 1728898418.7449 "/home/astro/Desktop/FilamentFetale/midsem_report/main.tex" "main.pdf" "main" 1728898419.01473 2
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/amsfonts/amsfonts.sty" 1359763108 5949 3f3fd50a8cc94c3d4cbf4fc66cd3df1c ""
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/base/article.cls" 1717359999 20144 67a5f8e0f9e445e8ec6834e595cebdc9 ""
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/base/size10.clo" 1717359999 8448 358bf3de18513f057a13bdc6e6770c41 ""
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/graphics-cfg/graphics.cfg" 1465944070 1224 978390e9c2234eab29404bc21b268d1e ""
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/graphics-def/pdftex.def" 1713382759 19440 9da9dcbb27470349a580fca7372d454b ""
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/graphics/graphics.sty" 1717359999 18363 b79c83eab17bf475b508f05e9807e605 ""
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/graphics/graphicx.sty" 1717359999 8010 6f2ad8c2b2ffbd607af6475441c7b5e4 ""
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/graphics/keyval.sty" 1717359999 2671 70891d50dac933918b827d326687c6e8 ""
+  "/home/astro/.TinyTeX/texmf-dist/tex/latex/graphics/trig.sty" 1717359999 4023 2c9f39712cf7b43d3eb93a8bbd5c8f67 ""
+  "/home/astro/.TinyTeX/texmf-dist/web2c/texmf.cnf" 1719785820 42007 0b741a3c21a5ca32b40e3846e75b3548 ""
+  "/home/astro/.TinyTeX/texmf-var/web2c/pdftex/pdflatex.fmt" 1721877202 6829339 f9cf7990803c0e4d21cc89a62be2a00f ""
+  "/home/astro/.TinyTeX/texmf.cnf" 1721943877.15362 679 e95db49b3971c649270bd42ba2e598f9 ""
+  "/home/astro/Desktop/FilamentFetale/midsem_report/main.tex" 1728878488 14589 1ba90c4452fe34efc2177e5bc9f4501e ""
+  "biblatex.sty" 0 -1 0 ""
+  "main.aux" 1728898418.74007 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "main.tex" 1728878488 14589 1ba90c4452fe34efc2177e5bc9f4501e ""
+  (generated)
+  "main.aux"
+  "main.log"
+  "main.pdf"
+  (rewritten before read)
