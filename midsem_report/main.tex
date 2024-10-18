@@ -5,10 +5,16 @@
 
 \usepackage[a4paper, margin=1in]{geometry} % Adjust margins here
 
+
+\newcommand{\m}{{\rm m}}
+
+
 \title{Characterizing Filamentary Structures in Turbulent Magnetohydrodynamic Simulations: \\
 {Mid Semester Report}}
 \author{Sasi Mitra Behara}
 \date{\today}
+
+
 
 \begin{document}
 
@@ -21,16 +27,19 @@ The interstellar medium (ISM) of galaxies consists of filamentary structures whe
 
 \section{Introduction}
 
-The interstellar medium (ISM) of galaxies is a complex environment composed of thermal gas, dust, turbulence, magnetic fields and cosmic rays, characterized by filamentary structures in several of these components that play a crucial role in the process of star formation. Understanding the properties of these filaments, such as their sizes, shapes, and dynamics, is essential for unraveling the mechanisms underlying star formation and gas dynamics in galaxies. Recent advancements in turbulent magnetohydrodynamic (MHD) simulations have provided valuable insights about ISM.
+The interstellar medium (ISM) of galaxies is a complex environment composed of thermal gas, dust, turbulence, magnetic fields and cosmic rays, characterized by filamentary structures in several of these components that play a crucial role in the process of star formation. While these filamentary structures have been identified in gas density, or magnetic fields through observations, the precise origin of these filaments is still unclear. Understanding the properties of these filaments, such as their sizes, shapes, and dynamics, is essential for unraveling the mechanisms underlying star formation and gas dynamics in galaxies. Recent advancements in turbulent magnetohydrodynamic (MHD) simulations have provided valuable insights about ISM.
 
 To effectively characterize the filaments present in the simulation data, we employ Minkowski functionals, which serve as a generalized method for quantifying geometric properties. For 3d structures, the properties are volume, surface area, mean curvature, and the Euler characteristic. These functionals can be used to derive additional metrics, including planarity and filamentarity, which are critical for understanding the structure and morphology of the filaments within the ISM.
 
 This report summarizes the development of a generalized code designed to compute the planarity and filamentarity of objects embedded in a three-dimensional space. This code can then be used to analyze the data produced in both the simulations and ISM observations.
 
+\section{Project Goals}
+The primary goal of the project would be to characterize filaments in ISM that has been simulated using state-of-the-art simulations. Using techniques to determine the properties of the filaments in the simulations, and these results can then be compared with data coming from observations of neutral hydrogen, synchrotron, and sub-millimeter radio waves. The results from this comparitive study will give us better insights into the mechanisms that lead to the formation of such filaments. The study will also identify the relative importance of various physical processes, and constrain the parameters of the simulations.
+
 \subsection{Project Outline}
 The Simulation data comes from the following paper \cite{DataPaper}, where, using numerical simulations the authors explore the properties of turbulence for subsonic and supersonic turbulent flows. 
 
-We can identify iso-density surfaces, where the density, or any other simulation parameter has the same value throughout the surface. Figure \ref{fig:b_field_isosurfaces} shows an illustration of what such iso-surfaces may look like \cite{AmitSetaThesis}. By choosing an appropriate value, we can isolate the filaments and then characterize them using Minkowski Functionals. 
+We can identify iso-density surfaces, where the density, or any other simulation parameter has the same value throughout the surface. Figure \ref{fig:b_field_isosurfaces} shows an illustration of what such iso-surfaces may look like \cite{AmitSetaThesis}. By choosing an appropriate value, we can isolate the filaments and then characterize them using Minkowski functionals. 
 
 
 \begin{figure}[h!]
@@ -44,26 +53,26 @@ We can identify iso-density surfaces, where the density, or any other simulation
 
 The initial part of the project focused on developing code to calculate the shapefinders for a given data cube and testing the code for its validity.
 
-\section{Minkowski Functionals}
+\section{Minkowski functionals}
 Minkowski functionals are a set of mathematical tools used to analyze the shape and structure of data, in a variety of fields, including cosmology and astrophysics \cite{1999PaperMinkowskiFunctionalsInCosmology}. These functionals measure the geometric properties of sets and can describe the morphology of complex structures. In cosmology, Minkowski functionals are particularly valuable for studying the large-scale structures of the universe and the connectivity of cosmic structures. Here, we use similar techniques to identify and characterize filamentary structures.
 
 
 \subsection{Hadwiger's Theorem}
-In Integral Geometry, Hadwiger's Theorem characterizes the valuations on convex bodies in $\mathbb{R}^n$. Hadwiger's Theorem is a seminal result in integral geometry that provides a comprehensive characterization of valuations on convex bodies in $\mathbb{R}^n$. The theorem states that any continuous, translation-invariant valuation defined on the space of convex bodies embedded in $\mathbb{R}^n$ can be represented as a linear combination of a set of $n+1$ valuations, known as Minkowski Functionals \cite{adler_taylor_2007}.
+In Integral Geometry, Hadwiger's Theorem characterizes the valuations on convex bodies in $\mathbb{R}^n$. Hadwiger's Theorem is a seminal result in integral geometry that provides a comprehensive characterization of valuations on convex bodies in $\mathbb{R}^n$. The theorem states that any continuous, translation-invariant valuation defined on the space of convex bodies embedded in $\mathbb{R}^n$ can be represented as a linear combination of a set of $n+1$ valuations, known as Minkowski functionals \cite{adler_taylor_2007}.
 
-Minkowski Functionals are a series of geometric measures that capture essential properties of convex shapes. In 3d Space ($\mathbb{R}^3$), The geometric interpretations of all Minkowski functionals in three dimensions are summarized in Table \ref{table:table_of_formulae} 
+Minkowski functionals are a series of geometric measures that capture essential properties of convex shapes. In 3d space ($\mathbb{R}^3$), The geometric interpretations of all Minkowski functionals in three dimensions are summarized in Table \ref{table:table_of_formulae} 
 
 \begin{table}[]
 \centering
 \begin{tabular}{|l|l|l|l|}
 \hline
-\textbf{$\mu$} & \textbf{$V_\mu$} & \textbf{Geometric Interpretation} & \textbf{Crofton Formulae for Sphere} \\ \hline
-0              & V                & Volume                            & $4/3 \pi r^3$                \\ \hline
-1              & A/6              & Surface Area                      & $2/3 \pi r^2$                  \\ \hline
-2              & H/$3\pi$         & Mean Curvature                    & $4/3r$                        \\ \hline
+\textbf{$\mu$} & \textbf{$V_\mu$} & \textbf{Geometric Interpretation} & \textbf{Crofton Formulae for sphere} \\ \hline
+0              & V                & Volume                            & $4/3 \, \pi r^3$                \\ \hline
+1              & A/6              & Surface Area                      & $2/3 \, \pi r^2$                  \\ \hline
+2              & H/$3\pi$         & Mean Curvature                    & $4/3\,r$                        \\ \hline
 3              & $\chi$           & Euler Characteristic              & 1                                    \\ \hline
 \end{tabular}
-\caption{Table of the Various Minkowski Functionals, and the corresponding Crofton's Formulae for a sphere \cite{AmitSetaThesis}}.
+\caption{Table of the Various Minkowski functionals, and the corresponding Crofton's Formulae for a sphere \cite{AmitSetaThesis}}.
 \label{table:table_of_formulae}
 \end{table}
 
@@ -71,14 +80,14 @@ Minkowski Functionals are a series of geometric measures that capture essential 
 \subsection{Shapefinders}
 An important task of morphological statistics is to quantify non-random features such as filaments and pancakes. Given the four Minkowski functionals, we aim to reduce the morphological information they provide, to two measures: planarity, and filamentarity. \cite{Schmalzing1999}
 
-Starting with the three independent ratios of the Minkowski funtionals, we get qualities that have a dimension of length. Requiring that these ratios give us the radius R if applied to a Sphere, we get three length scales
+Starting with the three independent ratios of the Minkowski funtionals, we get qualities that have a dimension of length. Requiring that these ratios give us the radius $r$ if applied to a sphere, we get three length scales
 \begin{equation}
     l_0 = \frac {V_0}{2V_1}, \: \:\:
     l_1 = \frac {2 V_1}{\pi V_2}, \:\:\:
     l_2 = \frac {3 V_2}{4 V_3}
 \end{equation}
 
-By arranging the three length (L), width (W) and thickness (T) such that $L \ge W \ge T$, we can now define dimensionless shapefinders by 
+We arrange the three in ascending order as $l_i \ge l_j \ge l_k$, we define length, width, thickness respectively as $l_i = L, l_j = W, l_k = T$.  we can now define dimensionless shapefinders by 
 \begin{equation}
     p = \frac {W - T}{W + T}, \: \: \:
     f = \frac {L - W}{L + W}
@@ -89,7 +98,7 @@ These shapefinders give us information about how pancake-like and how filament-l
 \section{QuantimPy Library}
 QuantImPy is a python library designed for scientific image processing. It performs morphological operations on numpy arrays and computes Minkowski functionals and functions. Inspired by the QuantIm C/C++ library, QuantImPy offers a user-friendly interface for handling complex image analysis tasks. The library is particularly useful for researchers and developers working with 2d and 3d image data, providing robust tools for quantitative analysis. \cite{boelens2021quantimpy}
 
-The library takes input of a 3d boolean array, which represents the 3d space, and the locations of the structure of interest embedded in the space is marked with a True, while free space (not belonging to the structure of interest) is marked as False. The library then solves integrals \ref{eq:M_0}, \ref{eq:M_1}, \ref{eq:M_2}, \ref{eq:M_3} to obtain the Minkowski Functionals \cite{quantimpy_minkowski}
+The library takes input of a 3d boolean array, which represents the 3d space, and the locations of the structure of interest embedded in the space is marked with a True, while free space (not belonging to the structure of interest) is marked as False. The library then solves integrals \ref{eq:M_0}, \ref{eq:M_1}, \ref{eq:M_2}, \ref{eq:M_3} to obtain the Minkowski functionals \cite{quantimpy_minkowski}
 
 \begin{equation}
     M_0(X) = \int_X dv, \\
@@ -110,7 +119,7 @@ The library takes input of a 3d boolean array, which represents the 3d space, an
 
 \subsection{Normalization and Developing a Wrapper Function}
 
-Solving the equations provided in the documentation for the case of a Sphere of Radius $R$, we see the equations reduce to the following:
+Solving the equations provided in the documentation for the case of a sphere of radius $r$, we see the equations reduce to the following:
 \begin{equation}
     M_0 = \frac 4 3 \pi r^3
 \end{equation}
@@ -132,10 +141,10 @@ We know the two values are off by a a normalizing factor, since they both repres
     N_0 = 1, \: \: N_1 = \frac 4 3 ,\: \: N_2 = \frac {2 \pi}{3} ,\: \: N_3 = \frac{3}{4 \pi} 
 \end{equation} 
 
-Such that, $V_\mu = N_\mu * M_\mu$, where $V_\mu$ is the corresponding Crofton Formula, which we need for calculating the shapefinders, and $M_\mu$ is the corresponding Minkowski Fucntional calculated by the library.
+Such that, $V_\mu = N_\mu M_\mu$, where $V_\mu$ is the corresponding Crofton Formula, which we need for calculating the shapefinders, and $M_\mu$ is the corresponding Minkowski functional calculated by the library.
 
 
-Wrapper functions in python were created to calculate these Functionals and convert them into the convenient forms, and additional python functions to calculate the Filamentarity and Planarity were also developed. These functions were tested for the case of a Sphere to ensure that the outputs match what is expected, and the outputs have been tabulated in Table \ref{tab:wrapper_function_outputs}. The differences between the Analytical and Computed Values are attributed to the numerical errors, and are sufficiently small.
+Wrapper functions in python were created to calculate these functionals and convert them into the convenient forms, and additional python functions to calculate the filamentarity and planarity were also developed. These functions were tested for the case of a sphere to ensure that the outputs match what is expected, and the outputs have been tabulated in Table \ref{tab:wrapper_function_outputs}. The differences between the Analytical and Computed Values are attributed to the numerical errors, and are sufficiently small.
 
 \begin{table}[]
 	\centering
@@ -147,22 +156,22 @@ Wrapper functions in python were created to calculate these Functionals and conv
 		$V_2$             & 100.28                  & 100.00                    \\ \hline
 		$V_3$             & 1.00                    & 1.00                      \\ \hline
 		T, W, L           & 74.77, 75.02, 75.21     & 75.00, 75.00, 75.00       \\ \hline
-		Planarity         & 0.00                    & 0.00                      \\ \hline
-		Filamentarity     & 0.00                    & 0.00                      \\ \hline
+		planarity         & 0.00                    & 0.00                      \\ \hline
+		filamentarity     & 0.00                    & 0.00                      \\ \hline
 	\end{tabular}
 	\label{tab:wrapper_function_outputs}
-	\caption{The Minkowski Functionals, the length scales, and the Planarity and Filamentarity, calculated by the code and the analytical formulae, for a sphere of radius 75m, embedded in a grid of $300^3 m^3$.}
+	\caption{The Minkowski functionals, the length scales, and the planarity and filamentarity, calculated by the code and the analytical formulae, for a sphere of radius $75\,\m$, embedded in a grid of $300^3\, \m^3$.}
 \end{table}
 
 
-\section{Radius Variance of Minkowski Functionals}
+\section{Radius Variance of Minkowski functionals}
 
-Minkowski Functionals behave predictably as we vary the sizes of the embedded spheres. Here, we explore two setups where we vary the radius of the embedded spheres, and observe how their Radius would change.
+Minkowski functionals behave predictably as we vary the sizes of the embedded spheres. Here, we explore two setups where we vary the radius of the embedded spheres, and observe how their Radius would change.
 
-\subsection{Varying the Radius of One Sphere}
+\subsection{Varying the Radius of One sphere}
 When varying the radius of a sphere embedded in a volume, we expect the volume to scale with the cube of the radius, the surface area to scale with the square of the radius, and the mean curvature to increase linearly with the radius, while the Euler characteristic remains constant at 1.
 
-To analyze this, a grid with a resolution of 50 points in each direction, covering a total length of 1 meter, was created. A sphere was positioned at the center of the grid. Spheres of various radii, ranging from 0.05 m to 0.47 m, were embedded, and their Minkowski functionals were calculated. These functionals were then plotted against the corresponding radii, with the best-fit polynomial curve included in the plot, as shown in Figure \ref{fig:single_sphere_plot}. We observe that \(V_0\) follows a cubic polynomial with very small coefficients for terms lower than cubic. \(V_1\) follows a quadratic polynomial, while \(V_2\) is a linear polynomial. \(V_3\), as expected, remains constant. These results align well with our initial expectations
+To analyze this, a grid with a resolution of 50 points in each direction, covering a total length of 1 meter, was created. A sphere was positioned at the center of the grid. spheres of various radii, ranging from 0.05 m to 0.47 m, were embedded, and their Minkowski functionals were calculated. These functionals were then plotted against the corresponding radii, with the best-fit polynomial curve included in the plot, as shown in Figure \ref{fig:single_sphere_plot}. We observe that \(V_0\) follows a cubic polynomial with very small coefficients for terms lower than cubic. \(V_1\) follows a quadratic polynomial, while \(V_2\) is a linear polynomial. \(V_3\), as expected, remains constant. These results align well with our initial expectations
 
 \begin{figure}[h!]
     \centering
@@ -172,12 +181,12 @@ To analyze this, a grid with a resolution of 50 points in each direction, coveri
 \end{figure}
 
 
-\subsection{A Lattice of Embedded Spheres}
+\subsection{A Lattice of Embedded spheres}
 In this case, 125 spheres were embedded in the volume, arranged in the form of a lattice (5 spheres in each direction) within a grid of resolution 500 points per dimension. The total grid length was set to 1 meter, resulting in the spheres being evenly spaced across the grid.
 
 We expect similar trends as with a single sphere: the volume of each sphere should scale with the cube of its radius, the surface area should scale with the square of the radius, and the mean curvature should increase linearly with the radius. For the Euler characteristic, the expected behavior is that it remains constant for each individual sphere, however at at a value of 125, to indicate there's 125 separate objects in the volume.
 
-Spheres of various radii, ranging from 0.05 m to 0.47 m, were embedded in this lattice, and their combined Minkowski functionals were calculated. The functionals for this arrangement of spheres were then plotted against the corresponding radii. Additionally, the best-fit polynomial curves for each functional were plotted, illustrating the overall behavior of the lattice structure, as shown in Figure \ref{fig:lattice_spheres_plot}. We see that $V_0$ follows a cubic polynomial with negligible lower-order terms, while $V_1$ adheres to a quadratic fit. $V_2$ is well described by a linear fit, and $V_3$, as expected, remains constant. The trends observed are consistent with expectations for a lattice of spheres
+spheres of various radii, ranging from 0.05 m to 0.47 m, were embedded in this lattice, and their combined Minkowski functionals were calculated. The functionals for this arrangement of spheres were then plotted against the corresponding radii. Additionally, the best-fit polynomial curves for each functional were plotted, illustrating the overall behavior of the lattice structure, as shown in Figure \ref{fig:lattice_spheres_plot}. We see that $V_0$ follows a cubic polynomial with negligible lower-order terms, while $V_1$ adheres to a quadratic fit. $V_2$ is well described by a linear fit, and $V_3$, as expected, remains constant. The trends observed are consistent with expectations for a lattice of spheres
 
 \begin{figure}[h!] 
     \centering 
@@ -186,9 +195,13 @@ Spheres of various radii, ranging from 0.05 m to 0.47 m, were embedded in this l
     \label{fig:lattice_spheres_plot} 
 \end{figure}
 
+
+
+
+
 \section{Summary}
 
-As part of the semester project so far, A tool has been developed to calculate the Minkowski Functionals and Shapefinders for any general structure, using python, and it's validity has been verified with a standard test case of spehres. This code can be now used to characterize the isodensity contours in the simulation data, which would be the next step in the project. 
+As part of the semester project so far, A tool has been developed to calculate the Minkowski functionals and Shapefinders for any general structure, using python, and it's validity has been verified with a standard test case of spehres. This code can be now used to characterize the isodensity contours in the simulation data, which would be the next step in the project. 
 
 
 \bibliographystyle{plain}  % Style of the bibliography (plain, unsrt, alpha, etc.)

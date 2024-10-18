@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.7.25)  16 OCT 2024 01:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.7.25)  16 OCT 2024 12:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -138,20 +138,20 @@ File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 ) (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 13.
-LaTeX Font Info:    ... okay on input line 13.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 19.
+LaTeX Font Info:    ... okay on input line 19.
  (/home/astro/.TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
@@ -192,25 +192,22 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 15.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 21.
 (/home/astro/.TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 15.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 21.
  (/home/astro/.TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 <Images/b_field_isosurfaces.png, id=1, 753.81625pt x 642.4pt>
 File: Images/b_field_isosurfaces.png Graphic file (type png)
 <use Images/b_field_isosurfaces.png>
-Package pdftex.def Info: Images/b_field_isosurfaces.png  used on input line 38.
+Package pdftex.def Info: Images/b_field_isosurfaces.png  used on input line 47.
 (pdftex.def)             Requested size: 226.48395pt x 193.00575pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-
-LaTeX Warning: Citation `1999PaperMinkowskiFunctionalsInCosmology' on page 1 undefined on input line 48.
 
 
 
@@ -219,57 +216,55 @@ LaTeX Warning: Citation `1999PaperMinkowskiFunctionalsInCosmology' on page 1 und
 {/home/astro/.TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 
 LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `tbp') on input line 56.
+               Default added (so using `tbp') on input line 65.
 
 
 
 [2 <./Images/b_field_isosurfaces.png>]
 
-LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `tbp') on input line 140.
-
-
-
 [3]
-<Images/single_sphere_radius_variance.png, id=28, 992.70876pt x 792.9625pt>
+
+LaTeX Warning: No positions in optional float specifier.
+               Default added (so using `tbp') on input line 149.
+
+<Images/single_sphere_radius_variance.png, id=28, 714.7503pt x 570.933pt>
 File: Images/single_sphere_radius_variance.png Graphic file (type png)
 <use Images/single_sphere_radius_variance.png>
-Package pdftex.def Info: Images/single_sphere_radius_variance.png  used on input line 169.
-(pdftex.def)             Requested size: 271.7835pt x 217.09134pt.
+Package pdftex.def Info: Images/single_sphere_radius_variance.png  used on input line 178.
+(pdftex.def)             Requested size: 271.7835pt x 217.10489pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
-[4 <./Images/single_sphere_radius_variance.png>]
-<Images/grid_radius_variance.png, id=32, 1003.75pt x 803.0pt>
+
+[4]
+<Images/grid_radius_variance.png, id=32, 722.7pt x 578.16pt>
 File: Images/grid_radius_variance.png Graphic file (type png)
 <use Images/grid_radius_variance.png>
-Package pdftex.def Info: Images/grid_radius_variance.png  used on input line 184.
-(pdftex.def)             Requested size: 271.7835pt x 217.42554pt.
+Package pdftex.def Info: Images/grid_radius_variance.png  used on input line 193.
+(pdftex.def)             Requested size: 271.7835pt x 217.427pt.
  (./main.bbl
 
-[5 <./Images/grid_radius_variance.png>])
+[5 <./Images/single_sphere_radius_variance.png> <./Images/grid_radius_variance.png>])
 
 [6] (./main.aux)
  ***********
 LaTeX2e <2024-06-01> patch level 2
 L3 programming layer <2024-05-27>
  ***********
-
-
-LaTeX Warning: There were undefined references.
-
  ) 
 Here is how much of TeX's memory you used:
- 2427 strings out of 475544
- 37759 string characters out of 5777453
+ 2428 strings out of 475544
+ 37801 string characters out of 5777453
  1941905 words of memory out of 5000000
- 25056 multiletter control sequences out of 15000+600000
+ 25057 multiletter control sequences out of 15000+600000
  566885 words of font info for 70 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 57i,9n,65p,786b,244s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,9n,65p,786b,259s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></home/astro/.TinyTeX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (6 pages, 433565 bytes).
+Output written on main.pdf (6 pages, 429563 bytes).
 PDF statistics:
- 98 PDF objects out of 1000 (max. 8388607)
+ 100 PDF objects out of 1000 (max. 8388607)
  57 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  16 words of extra memory for PDF output out of 10000 (max. 10000000)
